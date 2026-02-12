@@ -3,38 +3,147 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
-
-    <script src="config/main.js" type="module"></script>
+    <title>Sight Games - Play</title>
     <style>
-      body {
+      @import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap");
+      
+      :root {
+        --text-color: white;
+        --accent-color: #4b87f7;
+        --glass-bg: rgba(255,255,255,0.1);
+      }
+
+      * {
+        font-family: 'Ubuntu', sans-serif;
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)),
+                    url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMSEhMTExMWFhUXFxUaFxcYGBoWGBUVGBUVFxg") center/cover fixed;
+        color: var(--text-color);
+        height: 100vh;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 59, 168, 0.95);
+        backdrop-filter: blur(20px);
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(45deg, #fff, var(--accent-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .back-btn {
+        background: var(--glass-bg);
+        border: 2px solid var(--accent-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .back-btn:hover {
+        background: var(--accent-color);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(75, 135, 247, 0.4);
       }
 
       iframe {
         width: 100%;
-        height: 100vh;
+        height: calc(100vh - 80px);
+        margin-top: 80px;
         border: none;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+      }
+
+      .error {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        background: rgba(255,0,0,0.1);
+        border: 2px solid #ff4444;
+        padding: 40px;
+        border-radius: 20px;
+        backdrop-filter: blur(20px);
+      }
+
+      @media (max-width: 768px) {
+        .header { padding: 12px 20px; }
+        .logo { font-size: 1.4rem; }
+        .back-btn { padding: 10px 20px; font-size: 14px; }
+        iframe { margin-top: 70px; height: calc(100vh - 70px); }
       }
     </style>
   </head>
   <body>
+    <div class="header">
+      <div class="logo">Sight Games</div>
+      <a href="/" class="back-btn">← Back to Games</a>
+    </div>
+    
     <iframe id="gameFrame"></iframe>
 
     <script>
-      var serverUrl1 = "https://gms.parcoil.com";
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
+      const serverUrl1 = "https://gms.parcoil.com";
+      const urlParams = new URLSearchParams(window.location.search);
       const gameUrl = urlParams.get("gameurl");
 
+      const frame = document.getElementById("gameFrame");
+      
       if (!gameUrl) {
-        alert("Game URL not provided!");
-        window.location.href = "/"; // Redirect to homepage if game URL is missing
+        frame.style.display = "none";
+        document.body.innerHTML = `
+          <div class="error">
+            <h1 style="font-size: 2.5rem; margin-bottom: 20px; color: #ff4444;">⚠️ No Game Selected</h1>
+            <p style="font-size: 1.2rem; margin-bottom: 30px;">Please select a game from the homepage!</p>
+            <a href="/" style="
+              background: linear-gradient(45deg, #4b87f7, #00d4ff);
+              color: white;
+              padding: 15px 40px;
+              border-radius: 30px;
+              text-decoration: none;
+              font-weight: 700;
+              font-size: 1.1rem;
+              box-shadow: 0 8px 25px rgba(75,135,247,0.4);
+              transition: all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+              🎮 Go to Games
+            </a>
+          </div>
+        `;
       } else {
-        const embedUrl = `${serverUrl1}/${gameUrl}`;
-        document.getElementById("gameFrame").src = embedUrl;
+        frame.src = `${serverUrl1}/${gameUrl}`;
+        frame.onload = () => {
+          console.log("Game loaded:", gameUrl);
+        };
       }
     </script>
   </body>
 </html>
+
